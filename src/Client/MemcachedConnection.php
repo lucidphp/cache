@@ -10,7 +10,7 @@
  */
 
 
-namespace Selene\Module\Cache\Driver;
+namespace Selene\Module\Cache\Client;
 
 use Memcached;
 use RuntimeException;
@@ -18,7 +18,7 @@ use RuntimeException;
 /**
  * @class MemcachedConnection
  *
- * @package Selene\Module\Cache\Driver
+ * @package Selene\Module\Cache\Client
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com
  * @license MIT
@@ -93,7 +93,7 @@ class MemcachedConnection implements ConnectionInterface
      *
      * @return Memcached
      */
-    public function getDriver()
+    public function getClient()
     {
         return $this->memcached;
     }
@@ -103,10 +103,10 @@ class MemcachedConnection implements ConnectionInterface
      *
      * @return Memcached
      */
-    public function getDriverAndConnect()
+    public function getClientAndConnect()
     {
         $this->connect();
 
-        return $this->getDriver();
+        return $this->getClient();
     }
 }

@@ -9,16 +9,16 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache;
 
 /**
- * @interface DriverInterface
+ * @interface ClientInterface
  *
- * @package Lucid\Cache\Driver
+ * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-interface DriverInterface
+interface ClientInterface
 {
     /**
      * Flag a file as compressed

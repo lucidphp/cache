@@ -9,23 +9,23 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
 /**
- * @class DriverTest
+ * @class ClientTest
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-abstract class DriverTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractClientTest extends \PHPUnit_Framework_TestCase
 {
     /** @test */
     public function itShouldBeInstantiable()
     {
         $this->assertInstanceof(
-            'Lucid\Cache\Driver\DriverInterface',
-            $this->newDriver()
+            'Lucid\Cache\ClientInterface',
+            $this->newClient()
         );
     }
 
@@ -35,7 +35,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldThrowOnInvalidDateFormat()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $driver->parseExpireTime('foo bar');
     }
@@ -46,7 +46,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldThrowIfIncrementsIsString()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $driver->increment('item.fails', '12');
     }
@@ -57,7 +57,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldThrowIfIncrementsIsInvalid()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $driver->increment('item.fails', -1);
     }
@@ -65,7 +65,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnFalseIfItemDoesNotExist()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertFalse($driver->exists('item.fails'));
     }
@@ -73,19 +73,19 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnTrueIfItemExists()
     {
-        $this->assertTrue($this->newDriver()->exists('item.exists'));
+        $this->assertTrue($this->newClient()->exists('item.exists'));
     }
 
     /** @test */
     public function itShouldFetchStoredItems()
     {
-        $this->assertSame('exists', $this->newDriver()->read('item.exists'));
+        $this->assertSame('exists', $this->newClient()->read('item.exists'));
     }
 
     /** @test */
     public function itShouldReturnNullIfItemDoesNotExist()
     {
-        $this->assertNull($this->newDriver()->read('item.fails'));
+        $this->assertNull($this->newClient()->read('item.fails'));
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldReturnBooleanWhenStoringItems($time)
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertTrue($driver->write('item.success', 'data', $time));
         $this->assertFalse($driver->write('item.fails', 'data', $time));
@@ -103,7 +103,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnBooleanWhenDeletingItems()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertTrue($driver->delete('item.success'));
         $this->assertFalse($driver->delete('item.fails'));
@@ -112,7 +112,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnIncrementedValue()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(2, $driver->increment('item.inc', 1));
         $this->assertFalse($driver->increment('item.fails', 1));
@@ -121,7 +121,7 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function itShouldReturnDecrementedValue()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(0, $driver->decrement('item.dec', 1));
         $this->assertFalse($driver->decrement('item.fails', 1));
@@ -130,5 +130,5 @@ abstract class DriverTest extends \PHPUnit_Framework_TestCase
     /** @test */
     abstract public function flushingCacheShouldReturnBoolean();
 
-    abstract protected function newDriver();
+    abstract protected function newClient();
 }

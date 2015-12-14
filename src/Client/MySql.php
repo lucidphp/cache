@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This File is part of the Lucid\Cache\Driver package
+ * This File is part of the Lucid\Cache package
  *
  * (c) iwyg <mail@thomas-appel.com>
  *
@@ -9,15 +9,15 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
 /**
- * @class MySqlDriver
+ * @class MySqlClient
  *
- * @package Lucid\Cache\Driver
+ * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class MySqlDriver extends AbstractSqlDriver
+class MySql extends AbstractSqlClient
 {
 }

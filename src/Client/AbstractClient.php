@@ -9,28 +9,22 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
+use InvalidArgumentException;
 use Lucid\Cache\CacheInterface;
+use Lucid\Cache\ClientInterface;
 
 /**
- * @class AbstractDriver
- * @see DriverInterface
- * @abstract
+ * @class AbstractClient
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-abstract class AbstractDriver implements DriverInterface
+abstract class AbstractClient implements ClientInterface
 {
-
-    /**
-     * default cached expiry time in minutes
-     *
-     * @var float
-     * @access public
-     */
+    /** @var float */
     protected $defaultExpiry = 60;
 
     /**
@@ -94,14 +88,14 @@ abstract class AbstractDriver implements DriverInterface
      *
      * @param mixed $value
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @access private
      * @return void
      */
     private function validateIncrementValue($value)
     {
         if (!is_int($value) || $value < 1) {
-            throw new \InvalidArgumentException('Value must be Integer and greater that zero');
+            throw new InvalidArgumentException('Value must be Integer and greater that zero');
         }
     }
 
@@ -171,7 +165,7 @@ abstract class AbstractDriver implements DriverInterface
     protected function validateExpires($expires)
     {
         if (($str = is_string($expires)) && false === @strtotime($expires)) {
-            throw new \InvalidArgumentException(sprintf('Invalid expiry time "%s".', $expires));
+            throw new InvalidArgumentException(sprintf('Invalid expiry time "%s".', $expires));
         }
 
         return $str ? $expires : (int)$expires;

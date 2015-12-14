@@ -10,7 +10,7 @@
  */
 
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
 /**
  * @interface ConnectionInterface
@@ -47,12 +47,12 @@ interface ConnectionInterface
      *
      * @return mixed
      */
-    public function getDriver();
+    public function getClient();
 
     /**
      * Get the specified server driver and connect.
      *
      * @return mixed
      */
-    public function getDriverAndConnect();
+    public function getClientAndConnect();
 }

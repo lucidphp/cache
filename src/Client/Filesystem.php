@@ -10,27 +10,24 @@
  */
 
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
 use Lucid\Cache\CacheInterface;
 
 /**
- * @class FilesystemDriver
- * @see AbstractDriver
+ * @class FilesystemClient
+ * @see AbstractClient
  *
  * @package Selene\Module\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class FilesystemDriver extends AbstractDriver
+class Filesystem extends AbstractClient
 {
-    /**
-     * cache directory
-     *
-     * @var Stream\FSDirectory
-     * @access protected
-     */
-    protected $cachedir;
+    /** @var string */
+    private $cachedir;
 
     /**
      * Constructor.
@@ -80,7 +77,11 @@ class FilesystemDriver extends AbstractDriver
 
         list($contents, $timestamp) = $this->serializeData($data, $compressed, (int)$expires);
 
-        if (!file_put_contents($file = $this->getFilePath($key), $contents, LOCK_EX)) {
+        if (!file_exists($parent = dirname($file = $this->getFilePath($key)))) {
+            mkdir($parent);
+        }
+
+        if (false === file_put_contents($file, $contents, LOCK_EX)) {
             return false;
         }
 
@@ -114,12 +115,18 @@ class FilesystemDriver extends AbstractDriver
      */
     public function flush()
     {
-        foreach ($itr = new \DirectoryIterator($this->cachedir) as $path) {
-            if ($itr->isFile()) {
-                unlink($itr->getPathname());
-            }
+        if (!is_dir($this->cachedir)) {
+            return false;
         }
+
+        $flags = FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO |
+            FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS;
+
+        $this->rmDir($this->cachedir, $flags);
+
+        return true;
     }
+
 
     /**
      * {@inheritdoc}
@@ -163,13 +170,13 @@ class FilesystemDriver extends AbstractDriver
 
         $timestamp = filemtime($file);
 
-        list($contents,) = $this->serializeData((int)$data + $value, static::C_UNCOMPRESSED === $state);
+        list($contents,) = $this->serializeData($ret = ((int)$data + $value), static::C_UNCOMPRESSED === $state);
 
         file_put_contents($file, $contents, LOCK_EX);
 
         touch($file, $timestamp);
 
-        return true;
+        return $ret;
     }
 
     /**
@@ -185,20 +192,25 @@ class FilesystemDriver extends AbstractDriver
         $state = (int)substr($contents = file_get_contents($file), 0, 1);
         $data = substr($contents, 2);
 
-        $data = static::C_UNCOMPRESSED === $state ?
-            $data = unserialize($data) :
-            unserialize($this->uncompressData($data));
+        $data = static::C_UNCOMPRESSED === $state ? $data = unserialize($data) : unserialize($this->uncompressData($data));
 
         return [$data, $state];
     }
 
     /**
-     * compressData
+     * {@inheritdoc}
+     */
+    protected function getPersistLevel()
+    {
+        return CacheInterface::PERSIST;
+    }
+
+    /**
+     * Returns a base64 encoded comperessed string
      *
-     * @param Mixed $data
-     * @access private
-     * @return String base64 string representation of gzip compressed input
-     * data
+     * @param string $data
+     *
+     * @return string
      */
     private function compressData($data)
     {
@@ -208,9 +220,9 @@ class FilesystemDriver extends AbstractDriver
     /**
      * uncompressData
      *
-     * @param Mixed $data
-     * @access private
-     * @return String Mixed contents of the cached item
+     * @param string $data
+     *
+     * @return string
      */
     private function uncompressData($data)
     {
@@ -229,19 +241,19 @@ class FilesystemDriver extends AbstractDriver
     {
         $hash = hash('md5', $key);
 
-        return substr($hash, 0, 4).DIRECTORY_SEPARATOR.substr($hash, 4, 20);
+        return $this->cachedir.DIRECTORY_SEPARATOR.substr($hash, 0, 4).DIRECTORY_SEPARATOR.substr($hash, 4, 20);
     }
 
     /**
-     * serializeWithTime
+     * serializeData
      *
-     * @param Mixed $data
-     * @param Mixed $time
-     * @param Mixed $compressed
-     * @access private
-     * @return Mixed file contents
+     * @param mixed $data
+     * @param boolean $compressed
+     * @param int $timestamp
+     *
+     * @return array
      */
-    private function serializeData($data, $compressed = false, $timestamp = 0)
+    private function serializeData($data, $compressed = self::C_UNCOMPRESSED, $timestamp = 0)
     {
         $data = serialize($data);
         $data = $compressed ? $this->compressData($data) : $data;
@@ -250,6 +262,13 @@ class FilesystemDriver extends AbstractDriver
         return [$contents, $timestamp];
     }
 
+    /**
+     * setCacheDir
+     *
+     * @param string $path
+     *
+     * @return void
+     */
     private function setCacheDir($path)
     {
         if (!file_exists($path)) {
@@ -260,10 +279,26 @@ class FilesystemDriver extends AbstractDriver
     }
 
     /**
-     * {@inheritdoc}
+     * wipes a directory.
+     *
+     * @param string $rpath
+     * @param int $flags
+     *
+     * @return void
      */
-    protected function getPersistLevel()
+    private function rmDir($rpath, $flags)
     {
-        return CacheInterface::PERSIST;
+        $itr = new Filesystemiterator($rpath, $flags);
+
+        foreach ($itr as $path => $info) {
+            if ($info->isFile()) {
+                unlink($path);
+            }
+
+            if ($info->isDir()) {
+                $this->rmDir($path, $flags);
+                rmdir($path);
+            }
+        }
     }
 }

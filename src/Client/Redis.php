@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
-use Redis;
+use Redis as RedisClient;
 use Lucid\Cache\CacheInterface;
 
 /**
- * @class RedisDriver
+ * @class RedisClient
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class RedisDriver extends AbstractDriver
+class Redis extends AbstractClient
 {
     private $redis;
 
@@ -32,7 +32,7 @@ class RedisDriver extends AbstractDriver
      *
      * @return void
      */
-    public function __construct(Redis $redis)
+    public function __construct(RedisClient $redis)
     {
         $this->redis = $redis;
     }

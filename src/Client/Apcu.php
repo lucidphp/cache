@@ -9,17 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
+
+use RuntimeException;
 
 /**
- * @class ApcuDriver
- * @see ApcDriver
+ * @class Apcu
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class ApcuDriver extends ApcDriver
+class Apcu extends AbstractClient
 {
     /**
      * Constructor.
@@ -27,7 +28,7 @@ class ApcuDriver extends ApcDriver
     public function __construct()
     {
         if (!extension_loaded('apcu')) {
-            throw new \RuntimeException('APCu extension not loaded.');
+            throw new RuntimeException('APCu extension not loaded.');
         }
     }
 

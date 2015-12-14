@@ -9,19 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
-use Memcached;
+use Memcached as MemcachedClient;
 
 /**
- * @class MemcachedDriver
- * @see AbstractDriver
+ * @class MemcachedClient
  *
- * @package Lucid
+ * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class MemcachedDriver extends AbstractDriver
+class Memcached extends AbstractClient
 {
     /**
      * Memcached instance
@@ -37,7 +36,7 @@ class MemcachedDriver extends AbstractDriver
      *
      * @return void
      */
-    public function __construct(Memcached $memcached)
+    public function __construct(MemcachedClient $memcached)
     {
         $this->driver = $memcached;
     }
@@ -71,11 +70,9 @@ class MemcachedDriver extends AbstractDriver
     public function write($key, $data, $expires = 60, $compressed = false)
     {
         $cmp = $this->driver->getOption(Memcached::OPT_COMPRESSION);
-
         $this->driver->setOption(Memcached::OPT_COMPRESSION, $compressed);
 
         $cached = $this->driver->set($key, $data, $expires);
-
         $this->driver->setOption(Memcached::OPT_COMPRESSION, $cmp);
 
         return $cached;
@@ -116,13 +113,7 @@ class MemcachedDriver extends AbstractDriver
     }
 
     /**
-     * incrementValue
-     *
-     * @param mixed $key
-     * @param mixed $value
-     *
-     * @access public
-     * @return void
+     * {@inheritdoc}
      */
     protected function decrementValue($key, $value)
     {

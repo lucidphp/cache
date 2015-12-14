@@ -9,17 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
+
+use RuntimeException;
 
 /**
- * @class XcacheDriver
- * @see AbstractDriver
+ * @class XcacheClient
+ * @see AbstractClient
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class XcacheDriver extends AbstractDriver
+class XcacheClient extends AbstractClient
 {
     /**
      * Constructor.
@@ -27,7 +29,7 @@ class XcacheDriver extends AbstractDriver
     public function __construct()
     {
         if (!extension_loaded('xcache')) {
-            throw new \RuntimeException('XCache extension not loaded.');
+            throw new RuntimeException('XCache extension not loaded.');
         }
     }
 

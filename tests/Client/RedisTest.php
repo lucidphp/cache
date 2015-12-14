@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This File is part of the Lucid\Cache\Tests\Driver package
+ * This File is part of the Lucid\Cache\Tests\Client package
  *
  * (c) iwyg <mail@thomas-appel.com>
  *
@@ -9,19 +9,19 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
 use Lucid\Cache\CacheInterface;
-use Lucid\Cache\Driver\RedisDriver;
+use Lucid\Cache\Client\Redis as RedisClient;
 
 /**
- * @class RedisDriverTest
+ * @class RedisClientTest
  *
- * @package Lucid\Cache\Tests\Driver
+ * @package Lucid\Cache\Tests\Client
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class RedisDriverTest extends DriverTest
+class RedisTest extends AbstractClientTest
 {
     protected $rd;
     protected $driver;
@@ -29,7 +29,7 @@ class RedisDriverTest extends DriverTest
     /** @test */
     public function itShouldParseMinutesToUnixTimestamp()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(time() + 60, $driver->parseExpireTime(1));
     }
@@ -37,7 +37,7 @@ class RedisDriverTest extends DriverTest
     /** @test */
     public function itShouldParseDateToUnixTimestamp()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(time() + 60, $driver->parseExpireTime('60 seconds'));
     }
@@ -45,13 +45,13 @@ class RedisDriverTest extends DriverTest
     /** @test */
     public function flushingCacheShouldReturnBoolean()
     {
-        $this->assertTrue($this->newDriver()->flush());
+        $this->assertTrue($this->newClient()->flush());
     }
 
     /** @test */
     public function persistingShouldReturnBoolean()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertTrue($driver->write('item.success', 'data', CacheInterface::PERSIST));
         $this->assertTrue($driver->saveforever('item.success', 'data'));
@@ -67,9 +67,9 @@ class RedisDriverTest extends DriverTest
         ];
     }
 
-    protected function newDriver()
+    protected function newClient()
     {
-        return $this->driver = new RedisDriver($this->getRedis());
+        return $this->driver = new RedisClient($this->getRedis());
     }
 
     protected function getRedis()

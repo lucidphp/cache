@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This File is part of the Lucid\Cache\Tests\Driver package
+ * This File is part of the Lucid\Cache\Tests\Client package
  *
  * (c) iwyg <mail@thomas-appel.com>
  *
@@ -9,36 +9,37 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
-use Lucid\Cache\Driver\MemcacheDriver;
+use Memcache;
+use Lucid\Cache\Client\Memcache as MemcacheClient;
 
 /**
- * @class MemcachedDriverTest
+ * @class MemcachedClientTest
  *
- * @package Lucid\Cache\Tests\Driver
+ * @package Lucid\Cache\Tests\Client
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class MemcacheDriverTest extends MemcachedDriverTest
+class MemcacheTest extends MemcachedTest
 {
     /** @test */
     public function itShouldReturnFalseIfItemDoesNotExist()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
 
         $mc->method('get')->willReturn(false);
 
-        return DriverTest::itShouldReturnFalseIfItemDoesNotExist();
+        return ClientTest::itShouldReturnFalseIfItemDoesNotExist();
     }
 
     /** @test */
     public function itShouldReturnNullIfItemDoesNotExist()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $mc->method('get')->with('item.fails')->willReturn(false);
 
-        return DriverTest::itShouldReturnNullIfItemDoesNotExist();
+        return ClientTest::itShouldReturnNullIfItemDoesNotExist();
     }
 
     /**
@@ -47,8 +48,8 @@ class MemcacheDriverTest extends MemcachedDriverTest
      */
     public function itShouldReturnBooleanWhenStoringItems($time)
     {
-        list (, $mc) = $this->getDriver();
-        $flags = 0 | MemcacheDriver::ITEM_EXISTS;
+        list (, $mc) = $this->getClient();
+        $flags = 0 | Memcache::ITEM_EXISTS;
         $map = [
             ['item.success', 'data', $flags, $time, true],
             ['item.fails', 'data',$flags, $time, false]
@@ -58,13 +59,13 @@ class MemcacheDriverTest extends MemcachedDriverTest
             ->method('set')
             ->will($this->returnValueMap($map));
 
-        return DriverTest::itShouldReturnBooleanWhenStoringItems($time);
+        return ClientTest::itShouldReturnBooleanWhenStoringItems($time);
     }
 
     /** @test */
     public function itShouldReturnBooleanWhenDeletingItems()
     {
-        list ($driver, $mc) = $this->getDriver();
+        list ($driver, $mc) = $this->getClient();
 
         $map = [
             ['item.success', true],
@@ -75,13 +76,13 @@ class MemcacheDriverTest extends MemcachedDriverTest
             ->method('delete')
             ->will($this->returnValueMap($map));
 
-        return DriverTest::itShouldReturnBooleanWhenDeletingItems();
+        return ClientTest::itShouldReturnBooleanWhenDeletingItems();
     }
 
     /** @test */
     public function itShouldReturnIncrementedValue()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $map = [
             ['item.inc', 1, 2],
             ['item.fails', 1, false]
@@ -91,13 +92,13 @@ class MemcacheDriverTest extends MemcachedDriverTest
             ->method('increment')
             ->will($this->returnValueMap($map));
 
-        return DriverTest::itShouldReturnIncrementedValue();
+        return ClientTest::itShouldReturnIncrementedValue();
     }
 
     /** @test */
     public function itShouldReturnDecrementedValue()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $map = [
             ['item.dec', 1, 0],
             ['item.fails', 1, false]
@@ -107,7 +108,7 @@ class MemcacheDriverTest extends MemcachedDriverTest
             ->method('decrement')
             ->will($this->returnValueMap($map));
 
-        return DriverTest::itShouldReturnDecrementedValue();
+        return ClientTest::itShouldReturnDecrementedValue();
     }
 
     protected function getMemcache()
@@ -117,18 +118,18 @@ class MemcacheDriverTest extends MemcachedDriverTest
         return $this->getMock('Memcache', $methods);
     }
 
-    protected function getDriver()
+    protected function getClient()
     {
         if (null === $this->driver) {
-            $this->driver = new MemcacheDriver($this->mc = $this->getMemcache());
+            $this->driver = new Memcache($this->mc = $this->getMemcache());
         }
 
         return [$this->driver, $this->mc];
     }
 
-    protected function newDriver()
+    protected function newClient()
     {
-        list($driver, ) = $this->getDriver();
+        list($driver, ) = $this->getClient();
 
         return $driver;
     }

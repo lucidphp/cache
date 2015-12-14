@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This File is part of the Lucid\Cache\Tests\Driver package
+ * This File is part of the Lucid\Cache package
  *
  * (c) iwyg <mail@thomas-appel.com>
  *
@@ -9,23 +9,23 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
-use Lucid\Cache\Driver\ApcDriver;
+use Lucid\Cache\Client\Apcu;
 
 /**
- * @class ApcDriverTest
+ * @class ApcuTest
  *
- * @package Lucid\Cache\Tests\Driver
+ * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class ApcDriverTest extends DriverTest
+class ApcuTest extends AbstractClientTest
 {
     /** @test */
     public function itShouldParseMinutesToSeconts()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(60, $driver->parseExpireTime(1));
     }
@@ -33,7 +33,7 @@ class ApcDriverTest extends DriverTest
     /** @test */
     public function itShouldParseDateToSeconds()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(60, $driver->parseExpireTime('60 seconds'));
     }
@@ -41,7 +41,7 @@ class ApcDriverTest extends DriverTest
     /** @test */
     public function storingItemsShouldReturnBoolean()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertTrue($driver->saveForever('item.exists', 'data'));
         $this->assertFalse($driver->saveForever('item.fails', 'data'));
@@ -50,7 +50,7 @@ class ApcDriverTest extends DriverTest
     /** @test */
     public function flushingCacheShouldReturnBoolean()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertTrue($driver->flush());
     }
@@ -62,14 +62,14 @@ class ApcDriverTest extends DriverTest
         ];
     }
 
-    protected function newDriver()
+    protected function newClient()
     {
-        return new ApcDriver;
+        return new Apcu;
     }
 
     protected function setUp()
     {
         include_once dirname(__DIR__).'/Fixures/helper.php';
-        include_once dirname(__DIR__).'/Fixures/apchelper.php';
+        include_once dirname(__DIR__).'/Fixures/apcuhelper.php';
     }
 }

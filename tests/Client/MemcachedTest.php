@@ -9,30 +9,30 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
 use Memcached;
-use Lucid\Cache\Driver\MemcachedDriver;
+use Lucid\Cache\Client\Memcached as MemcachedClient;
 
 /**
- * @class MemcachedDriverTest
+ * @class MemcachedClientTest
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class MemcachedDriverTest extends DriverTest
+class MemcachedTest extends AbstractClientTest
 {
     /** @var Memcached */
     private $mc;
 
-    /** @var Lucid\Cache\Driver\DriverInterface */
+    /** @var Lucid\Cache\Client\ClientInterface */
     protected $driver;
 
     /** @test */
     public function itShouldParseMinutesToUnixTimestamp()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(time() + 60, $driver->parseExpireTime(1));
     }
@@ -40,7 +40,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldParseDateToUnixTimestamp()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
 
         $this->assertSame(time() + 60, $driver->parseExpireTime('60 seconds'));
     }
@@ -48,7 +48,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnFalseIfItemDoesNotExist()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
 
 
         return parent::itShouldReturnFalseIfItemDoesNotExist();
@@ -57,7 +57,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnTrueIfItemExists()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $mc->method('get')->willReturn(true);
 
         return parent::itShouldReturnTrueIfItemExists();
@@ -66,7 +66,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldFetchStoredItems()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $mc->method('get')->with('item.exists')->willReturn('exists');
 
         return parent::itShouldFetchStoredItems();
@@ -75,7 +75,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnNullIfItemDoesNotExist()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $mc->method('get')->with('item.fails')->willReturn(false);
         $mc->method('getResultCode')->willReturn(\Memcached::RES_NOTFOUND);
 
@@ -88,7 +88,7 @@ class MemcachedDriverTest extends DriverTest
      */
     public function itShouldReturnBooleanWhenStoringItems($time)
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $map = [
             ['item.success', 'data', $time, true],
             ['item.fails', 'data', $time, false]
@@ -104,7 +104,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnBooleanWhenDeletingItems()
     {
-        list (, $mc) = $this->hashgetDriver();
+        list (, $mc) = $this->getClient();
 
         $map = [
             ['item.success', null, true],
@@ -121,7 +121,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function flushingCacheShouldReturnBoolean()
     {
-        list ($driver, $mc) = $this->getDriver();
+        list ($driver, $mc) = $this->getClient();
         $mc->method('flush')->willReturn(true);
 
         $this->assertTrue($driver->flush());
@@ -129,8 +129,8 @@ class MemcachedDriverTest extends DriverTest
         $this->mc = null;
         $this->driver = null;
 
-        list ($driver, $mc) = $this->getDriver();
-        $driver = new MemcachedDriver($mc = $this->getMemcached());
+        list ($driver, $mc) = $this->getClient();
+        $driver = new MemcachedClient($mc = $this->getMemcached());
         $mc->method('flush')->willReturn(false);
 
         $this->assertFalse($driver->flush());
@@ -139,7 +139,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function memcachedShouldReceiveZeroEpireytime()
     {
-        $driver = new MemcachedDriver($mc = $this->getMemcached());
+        $driver = new MemcachedClient($mc = $this->getMemcached());
         $mc->method('set')->with('item.success', 'data', 0)->willReturn(true);
 
         $this->assertTrue($driver->saveForever('item.success', 'data'));
@@ -148,7 +148,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnIncrementedValue()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $map = [
             ['item.inc', 1, null, null, 2],
             ['item.fails', 1, null, null, false]
@@ -164,7 +164,7 @@ class MemcachedDriverTest extends DriverTest
     /** @test */
     public function itShouldReturnDecrementedValue()
     {
-        list (, $mc) = $this->getDriver();
+        list (, $mc) = $this->getClient();
         $map = [
             ['item.dec', 1, null, null, 0],
             ['item.fails', 1, null, null, false]
@@ -185,18 +185,18 @@ class MemcachedDriverTest extends DriverTest
     }
 
 
-    protected function getDriver()
+    protected function getClient()
     {
         if (null === $this->driver) {
-            $this->driver = new MemcachedDriver($this->mc = $this->getMemcached());
+            $this->driver = new MemcachedClient($this->mc = $this->getMemcached());
         }
 
         return [$this->driver, $this->mc];
     }
 
-    protected function newDriver()
+    protected function newClient()
     {
-        list($driver, ) = $this->getDriver();
+        list($driver, ) = $this->getClient();
 
         return $driver;
     }
@@ -209,9 +209,9 @@ class MemcachedDriverTest extends DriverTest
 
     protected function setUp()
     {
-        $this->mc = null;
-        $this->driver = null;
-        $this->markTestIncomplete();
+        $this->markTestSkipped('Skipping tests until https://github.com/php-memcached-dev/php-memcached/issues/126 is resolved.');
+        //$this->mc = null;
+        //$this->driver = null;
     }
 
     /**
@@ -221,9 +221,8 @@ class MemcachedDriverTest extends DriverTest
      *
      * @return Memcached
      */
-    private function getMemcached()
+    protected function getMemcached()
     {
-        //return new Memcached;
-        return $this->getMockBuilder('Memcached')->disableOriginalConstructor()->getMock();
+        return $this->getMock('Memcached', ['get', 'set', 'delete', 'flush', 'increment', 'decrement']);
     }
 }

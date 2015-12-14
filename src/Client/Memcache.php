@@ -9,19 +9,18 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
-use Memcache;
+use Memcache as MemcacheClient;
 
 /**
- * @class MemcacheDriver
- * @see MemcachedDriver
+ * @class MemcacheClient
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class MemcacheDriver extends MemcachedDriver
+class Memcache extends MemcachedClient
 {
     /**
      * Flag stored along with cached items.
@@ -35,7 +34,7 @@ class MemcacheDriver extends MemcachedDriver
      *
      * @param Memcache $memcache
      */
-    public function __construct(Memcache $memcache)
+    public function __construct(MemcacheClient $memcache)
     {
         $this->driver = $memcache;
     }

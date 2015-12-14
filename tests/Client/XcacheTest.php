@@ -9,34 +9,38 @@
  * that was distributed with this package.
  */
 
-namespace Lucid\Cache\Tests\Driver;
+namespace Lucid\Cache\Tests\Client;
 
-use Lucid\Cache\Driver\XcacheDriver;
+use ReflectionClass;
+use Lucid\Cache\Client\Xcache;
 
 /**
- * @class XcacheDriverTest
- * @see DriverTest
+ * @class XcacheClientTest
+ * @see ClientTest
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class XcacheDriverTest extends DriverTest
+class XcacheTest extends AbstractClientTest
 {
     /** @test */
     public function itShouldParseMinutesToSeconts()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
         $this->assertSame(60, $driver->parseExpireTime(1));
     }
 
     /** @test */
     public function itShouldParseDateToSeconds()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
         $this->assertSame(60, $driver->parseExpireTime('60 seconds'));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function timeProvider()
     {
         return [
@@ -47,13 +51,13 @@ class XcacheDriverTest extends DriverTest
     /** @test */
     public function flushingCacheShouldReturnBoolean()
     {
-        $driver = $this->newDriver();
+        $driver = $this->newClient();
         $this->assertTrue($driver->flush());
     }
 
-    protected function newDriver()
+    protected function newClient()
     {
-        return new XcacheDriver;
+        return (new ReflectionClass('Lucid\Cache\Client\Xcache'))->newInstanceWithoutConstructor();
     }
 
     protected function setUp()

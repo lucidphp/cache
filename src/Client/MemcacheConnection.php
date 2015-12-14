@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This File is part of the Selene\Module\Cache\Driver package
+ * This File is part of the Selene\Module\Cache\Client package
  *
  * (c) Thomas Appel <mail@thomas-appel.com>
  *
@@ -9,7 +9,7 @@
  * that was distributed with this package.
  */
 
-namespace Selene\Module\Cache\Driver;
+namespace Selene\Module\Cache\Client;
 
 use Memcache;
 use RuntimeException;
@@ -17,7 +17,7 @@ use RuntimeException;
 /**
  * @class MemcacheConnection
  *
- * @package Selene\Module\Cache\Driver
+ * @package Selene\Module\Cache\Client
  * @version $Id$
  * @author Thomas Appel <mail@thomas-appel.com>
  * @license MIT
@@ -94,7 +94,7 @@ class MemcacheConnection implements ConnectionInterface
      *
      * @return Memcache
      */
-    public function getDriver()
+    public function getClient()
     {
         return $this->memcache;
     }
@@ -104,11 +104,11 @@ class MemcacheConnection implements ConnectionInterface
      *
      * @return Memcache
      */
-    public function getDriverAndConnect()
+    public function getClientAndConnect()
     {
         $this->connect();
 
-        return $this->getDriver();
+        return $this->getClient();
     }
 
     /**

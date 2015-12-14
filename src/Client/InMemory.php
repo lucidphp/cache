@@ -10,45 +10,33 @@
  */
 
 
-namespace Lucid\Cache\Driver;
+namespace Lucid\Cache\Client;
 
 use ArrayObject;
 
 /**
- * @class ArrayDriver
- * @see AbstractDriver
+ * @class ArrayClient
  *
  * @package Lucid\Cache
  * @version $Id$
  * @author iwyg <mail@thomas-appel.com>
  */
-class ArrayDriver extends AbstractDriver
+class ArrayClient extends AbstractClient
 {
-    /**
-     * storage
-     *
-     * @var ArrayObject
-     */
-    protected $storage;
+    /** @var ArrayObject */
+    private $storage;
+
+    /** @var bool */
+    private $persist;
+
+    /** @var string */
+    private $persistPath;
 
     /**
-     * persist
+     * Constructor.
      *
-     * @var bool
-     */
-    protected $persist;
-
-    /**
-     * persistPath
-     *
-     * @var string
-     */
-    protected $persistPath;
-
-    /**
-     * @param mixed $persist
+     * @param bool $persist
      * @param string $path
-     *
      */
     public function __construct($persist = false, $path = '')
     {
@@ -141,7 +129,7 @@ class ArrayDriver extends AbstractDriver
      *
      * @return void
      */
-    private function setUpStorage()
+    private function boot()
     {
         if ($this->persist and file_exists($this->persistPath)) {
             try {
